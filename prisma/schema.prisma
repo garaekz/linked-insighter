@@ -8,14 +8,18 @@ generator client {
 }
 
 model User {
-  id    String @id @default(cuid())
-  email String @unique
-
+  id        String   @id @default(cuid())
+  email     String   @unique
+  username  String   @unique
+  githubId  String?  @unique
+  avatarUrl String?
+  name      String
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
 
   password Password?
   notes    Note[]
+  reviews  Review[]
 }
 
 model Password {
@@ -34,5 +38,73 @@ model Note {
   updatedAt DateTime @updatedAt
 
   user   User   @relation(fields: [userId], references: [id], onDelete: Cascade, onUpdate: Cascade)
+  userId String
+}
+
+model Applicant {
+  id         String       @id @default(cuid())
+  name       String
+  username   String       @unique
+  headline   String?
+  location   String?
+  pictureUrl String?
+  summary    String?
+  createdAt  DateTime     @default(now())
+  updatedAt  DateTime     @updatedAt
+  experiences Experience[]
+  educations  Education[]
+  skills      Skill[]
+  reviews     Review[]
+}
+
+model Experience {
+  id          String   @id @default(cuid())
+  title       String
+  company     String
+  location    String?
+  tenure      String?
+  description String?
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  applicant   Applicant @relation(fields: [applicantId], references: [id], onDelete: Cascade, onUpdate: Cascade)
+  applicantId String
+}
+
+model Education {
+  id           String   @id @default(cuid())
+  school       String
+  degree       String?
+  fieldOfStudy String?
+  startDate    String?
+  endDate      String?
+  description  String?
+  createdAt    DateTime @default(now())
+  updatedAt    DateTime @updatedAt
+
+  applicant   Applicant @relation(fields: [applicantId], references: [id], onDelete: Cascade, onUpdate: Cascade)
+  applicantId String
+}
+
+model Skill {
+  id        String   @id @default(cuid())
+  name      String
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  applicant   Applicant @relation(fields: [applicantId], references: [id], onDelete: Cascade, onUpdate: Cascade)
+  applicantId String
+}
+
+model Review {
+  id        String   @id @default(cuid())
+  content      String
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  applicant   Applicant @relation(fields: [applicantId], references: [id], onDelete: Cascade, onUpdate: Cascade)
+  applicantId String
+
+  user   User @relation(fields: [userId], references: [id], onDelete: Cascade, onUpdate: Cascade)
   userId String
 }
