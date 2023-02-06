@@ -11,6 +11,7 @@ export async function getApplicantByUsername(username: Applicant["username"]) {
       experiences: true,
       educations: true,
       skills: true,
+      reviews: { orderBy: { createdAt: "desc" }},
     },
   });
 }
@@ -48,6 +49,11 @@ export async function createApplicant(profile: Profile, slug: string) {
           name: skill,
         })),
       },
+    },
+    include: {
+      experiences: true,
+      educations: true,
+      skills: true,
     },
   });
 

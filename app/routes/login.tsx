@@ -29,7 +29,7 @@ export default function LoginPage() {
             <div className="lg:w-1/2">
               <img
                 className="h-7 w-auto sm:h-8"
-                src="https://merakiui.com/images/logo.svg"
+                src="/loguito.svg"
                 alt=""
               />
 

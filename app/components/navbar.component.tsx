@@ -1,63 +1,73 @@
-import { Form } from "@remix-run/react";
+import type { User } from "@prisma/client";
+import { Form, Link, useMatches } from "@remix-run/react";
 import { Dropdown, Navbar, Avatar } from "flowbite-react";
 
-export default function RootNavbar({ user }) {
+export default function RootNavbar({ user }: { user: User }) {
+  const matches = useMatches();
+  const { pathname } = matches[matches.length - 1];
   return (
-    <Navbar fluid={true} rounded={true}>
-      <Navbar.Brand href="https://flowbite.com/">
+    <Navbar fluid={true} className="sm:px-10">
+      <Navbar.Brand href="/dashboard">
         <img
-          src="https://flowbite.com/docs/images/logo.svg"
-          className="mr-3 h-6 sm:h-9"
-          alt="Flowbite Logo"
+          src="/loguito.svg"
+          className="mr-3 h-6 sm:h-9 p-1.5"
+          alt="Logo"
         />
-        <span className="self-center whitespace-nowrap text-xl font-semibold dark:text-white">
-          Flowbite
-        </span>
       </Navbar.Brand>
-      { user ? <div className="flex md:order-2">
-        <Dropdown
-          arrowIcon={false}
-          inline={true}
-          label={
-            <Avatar
-              alt="User settings"
-              img={user.avatarUrl}
-              rounded={true}
-            />
-          }
-        >
-          <Dropdown.Header>
-            <span className="block text-sm">{ user.username }</span>
-            <span className="block truncate text-sm font-medium">
-              { user.email }
-            </span>
-          </Dropdown.Header>
-          <Dropdown.Item>Dashboard</Dropdown.Item>
-          <Dropdown.Item>Settings</Dropdown.Item>
-          <Dropdown.Item>Earnings</Dropdown.Item>
-          <Dropdown.Divider />
-          <Dropdown.Item>
-          <Form action="/logout" method="post">
-            <button>Logout</button>
-          </Form>
-          </Dropdown.Item>
-        </Dropdown>
-        <Navbar.Toggle />
-      </div>
-      : <div className="flex md:order-2">
-        <Navbar.Link href="/login">Login</Navbar.Link>
-        <Navbar.Link href="/register">Register</Navbar.Link>
-        <Navbar.Toggle />
-      </div> }
-      
+      {user ? (
+        <div className="flex md:order-2">
+          <Dropdown
+            arrowIcon={false}
+            inline={true}
+            label={
+              <Avatar
+                alt="User settings"
+                img={user.avatarUrl || undefined}
+                rounded={true}
+              />
+            }
+          >
+            <Dropdown.Header>
+              <span className="block font-bold text-base">{user.username}</span>
+              <span className="block truncate text-xs font-light">
+                {user.email}
+              </span>
+            </Dropdown.Header>
+            <Dropdown.Item>
+              <Form action="/logout" method="post">
+                <button>Logout</button>
+              </Form>
+            </Dropdown.Item>
+          </Dropdown>
+          <Navbar.Toggle />
+        </div>
+      ) : (
+        <div className="flex md:order-2">
+          <Navbar.Link href="/login">Login</Navbar.Link>
+          <Navbar.Link href="/register">Register</Navbar.Link>
+          <Navbar.Toggle />
+        </div>
+      )}
+
       <Navbar.Collapse>
-        <Navbar.Link href="/navbars" active={true}>
+        <Link
+          to="/"
+          className="font-semibold text-gray-800 hover:text-gray-900 dark:text-gray-400 dark:hover:text-gray-200"
+        >
           Home
-        </Navbar.Link>
-        <Navbar.Link href="/navbars">About</Navbar.Link>
-        <Navbar.Link href="/navbars">Services</Navbar.Link>
-        <Navbar.Link href="/navbars">Pricing</Navbar.Link>
-        <Navbar.Link href="/navbars">Contact</Navbar.Link>
+        </Link>
+        <Link
+          to="/dashboard"
+          className={`${pathname === '/dashboard/' ? 'font-bold text-gray-800 text-cyan-400':'text-gray-800 hover:text-gray-900 dark:text-gray-400 dark:hover:text-gray-200 font-semibold'  }`}
+        >
+          New Search
+        </Link>
+        <Link
+          to="/dashboard/my-searches"
+          className={`${pathname === '/dashboard/my-searches' ? 'font-bold text-gray-800 text-cyan-400':'text-gray-800 hover:text-gray-900 dark:text-gray-400 dark:hover:text-gray-200 font-semibold'  }`}
+        >
+          My Searches
+        </Link>
       </Navbar.Collapse>
     </Navbar>
   );

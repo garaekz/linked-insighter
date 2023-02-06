@@ -1,3 +1,5 @@
+import dayjs from 'dayjs';
+import relativeTime from 'dayjs/plugin/relativeTime';
 import { useMatches } from "@remix-run/react";
 import { useMemo } from "react";
 
@@ -69,3 +71,8 @@ export function useUser(): User {
 export function validateEmail(email: unknown): email is string {
   return typeof email === "string" && email.length > 3 && email.includes("@");
 }
+
+export const dateToTimeAgo = (date: string | Date) => {
+  dayjs.extend(relativeTime);
+  return dayjs(date).fromNow();
+};

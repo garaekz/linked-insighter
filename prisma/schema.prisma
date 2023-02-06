@@ -9,11 +9,14 @@ generator client {
 
 model User {
   id        String   @id @default(cuid())
-  email     String   @unique
-  username  String   @unique
-  githubId  String?  @unique
-  avatarUrl String?
   name      String
+  username  String?   @unique
+  email     String   @unique
+  avatarUrl String?
+  githubId  String?  @unique
+  discordId String?  @unique
+  googleId  String?  @unique
+  twitterId String?  @unique
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
 
