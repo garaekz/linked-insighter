@@ -17,7 +17,8 @@ import { extractPayloadData, generateReview } from "~/services/cohere.server";
 import { dateToTimeAgo, isDeleted, isError } from "~/utils";
 import { Fragment, useEffect, useState } from "react";
 import { Dialog, Transition } from "@headlessui/react";
-import type { GenericError } from "~/types";
+import type { Review, User } from "@prisma/client";
+import type { ApplicantWithRelations } from "~/models/applicant.server";
 
 export async function loader({ request, params }: LoaderArgs) {
   const { slug } = params;
@@ -69,10 +70,11 @@ export default function SingleApplicantsPage() {
   const submit = useSubmit();
   const [deletingReview, setDeletingReview] = useState("");
   const [isDeleting, setIsDeleting] = useState(false);
-  const { applicant, user } = useLoaderData<typeof loader>();
   const navigation = useNavigation();
   const isSubmitting = navigation.state === "submitting";
   const actionData = useActionData<typeof action>();
+  const user = useLoaderData<{ user: User }>().user;
+  const applicant = useLoaderData<{ applicant: ApplicantWithRelations }>().applicant;
   // const error = useActionData() as unknown as GenericError | undefined;
 
   useEffect(() => {
@@ -105,7 +107,7 @@ export default function SingleApplicantsPage() {
             Hi{" "}
             <span className="font-bold dark:text-cyan-300 text-violet-900">
               {" "}
-              {user?.username ? `@${user.username}` : user?.name}!,{" "}
+              {user.username ? `@${user.username}` : user?.name}!,{" "}
             </span>{" "}
             this is what I found about{" "}
             <span className="font-bold italic dark:text-cyan-300 text-violet-900">
@@ -218,7 +220,7 @@ export default function SingleApplicantsPage() {
             Reviews ({applicant.reviews.length})
           </h1>
         )}
-        {applicant.reviews.map((review) => (
+        {applicant.reviews.map((review: any) => (
           <div
             key={review.id}
             id={review.id}
@@ -236,7 +238,7 @@ export default function SingleApplicantsPage() {
               )}
             </div>
             <div className="flex flex-col gap-2">
-              {review.content.split("\n").map((line, index) => (
+              {review.content.split("\n").map((line: string, index: number) => (
                 <p key={index} className="text-sm dark:font-light">
                   {line}
                 </p>
