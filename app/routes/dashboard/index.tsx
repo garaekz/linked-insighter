@@ -17,6 +17,7 @@ import { getProfileData } from "~/services/scraper.server";
 import { extractPayloadData, generateReview } from "~/services/cohere.server";
 import { createReview } from "~/models/review.server";
 import { authenticator } from "~/services/auth.server";
+import type { GenericError } from "~/types";
 
 const urlRegex = /https:\/\/www\.linkedin\.com\/in\/(.*)\//;
 
@@ -34,7 +35,7 @@ const getSlugFromUrl = (url: string) => {
 export async function action({ request }: ActionArgs) {
   try {
     const formData = await request.formData();
-    let slug = formData.get("slug");
+    let slug = formData.get("slug") as string | null;
     if (!slug) {
       throw new Error("Please enter a valid LinkedIn profile URL or username");
     }
@@ -56,7 +57,9 @@ export async function action({ request }: ActionArgs) {
     const result = await createApplicant(data, slug as string);
     const payload = extractPayloadData(result);
     const review = await generateReview(payload);
-    const user = await authenticator.isAuthenticated(request);
+    const user = await authenticator.isAuthenticated(request, {
+      failureRedirect: "/login",
+    });
     await createReview(review.body.generations[0].text, user.id, result.id);
     return redirect(`/dashboard/applicants/${slug}`);
   } catch (error: any) {
@@ -71,7 +74,7 @@ export default function DashboardIndexPage() {
   const slugRef = React.useRef<HTMLInputElement>(null);
   const navigation = useNavigation();
   const isSubmitting = navigation.state === "submitting";
-  const actionData = useActionData<typeof action>();
+  const error =  useActionData() as unknown as GenericError;
 
   useEffect(() => {
     if (slug.match(urlRegex)) {
@@ -82,7 +85,7 @@ export default function DashboardIndexPage() {
     }
   }, [slug]);
 
-  if (actionData?.error) {
+  if (error?.error.message) {
     return (
       <div className="mt-6">
         <div
@@ -105,7 +108,7 @@ export default function DashboardIndexPage() {
           <span className="sr-only">Info</span>
           <div>
             <span className="font-medium">Error:</span>{" "}
-            {actionData.error.message}
+            {error.error.message}
           </div>
         </div>
       </div>
@@ -131,6 +134,7 @@ export default function DashboardIndexPage() {
                 <BsLinkedin className="h-5 w-5 text-gray-500 dark:text-gray-400" />
               </div>
               <input
+                readOnly={isSubmitting}
                 ref={slugRef}
                 id="slug"
                 required

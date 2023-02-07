@@ -1,8 +1,15 @@
-import type { Applicant } from "@prisma/client";
-import type { Education, Experience, Profile } from "@garaekz/inscraper";
+import type { Applicant, Education, Experience, Review, Skill } from "@prisma/client";
+import type { Profile } from "@garaekz/inscraper";
 import { prisma } from "~/db.server";
 
 export type { Applicant } from "@prisma/client";
+
+export type ApplicantWithRelations = Applicant & {
+  experiences: Experience[];
+  educations: Education[];
+  skills: Skill[];
+  reviews: Review[];
+};
 
 export async function getApplicantByUsername(username: Applicant["username"]) {
   return prisma.applicant.findUnique({
@@ -26,7 +33,7 @@ export async function createApplicant(profile: Profile, slug: string) {
       pictureUrl: profile.profilePicture,
       summary: profile.summary,
       experiences: {
-        create: profile.experience.map((exp: Experience) => ({
+        create: profile.experience.map((exp: any) => ({
           title: exp.title,
           company: exp.company,
           location: exp.location,
@@ -35,7 +42,7 @@ export async function createApplicant(profile: Profile, slug: string) {
         })),
       },
       educations: {
-        create: profile.education.map((edu: Education) => ({
+        create: profile.education.map((edu: any) => ({
           school: edu.school,
           degree: edu.degree,
           fieldOfStudy: edu.fieldOfStudy,
@@ -54,6 +61,7 @@ export async function createApplicant(profile: Profile, slug: string) {
       experiences: true,
       educations: true,
       skills: true,
+      reviews: { orderBy: { createdAt: "desc" }},
     },
   });
 

@@ -6,14 +6,16 @@ import {
   useSubmit,
 } from "@remix-run/react";
 import type { ActionArgs, LoaderArgs } from "@remix-run/server-runtime";
+import { json } from "@remix-run/server-runtime";
 import { redirect } from "@remix-run/server-runtime";
 import { getApplicantByUsername } from "~/models/applicant.server";
 import { createReview, deleteReview } from "~/models/review.server";
 import { authenticator } from "~/services/auth.server";
 import { extractPayloadData, generateReview } from "~/services/cohere.server";
-import { dateToTimeAgo } from "~/utils";
+import { dateToTimeAgo, isDeleted, isError } from "~/utils";
 import { Fragment, useEffect, useState } from "react";
 import { Dialog, Transition } from "@headlessui/react";
+import type { GenericError } from "~/types";
 
 export async function loader({ request, params }: LoaderArgs) {
   const user = await authenticator.isAuthenticated(request);
@@ -32,13 +34,18 @@ export async function action({ request, params }: ActionArgs) {
       try {
         const { slug } = params;
         const result = await getApplicantByUsername(slug as string);
+        if (!result) {
+          throw new Error("Applicant not found");
+        }
         const payload = extractPayloadData(result!);
         const review = await generateReview(payload);
-        const user = await authenticator.isAuthenticated(request);
+        const user = await authenticator.isAuthenticated(request, {
+          failureRedirect: "/login",
+        });
         await createReview(review.body.generations[0].text, user.id, result.id);
         return redirect(`/dashboard/applicants/${slug}`);
       } catch (error: any) {
-        return { error: { status: 400, message: error.message } };
+        return json({ error: { status: 400, message: error.message } });
       }
     }
     case "DELETE": {
@@ -48,11 +55,11 @@ export async function action({ request, params }: ActionArgs) {
         await deleteReview(reviewId);
         return { deleted: true };
       } catch (error: any) {
-        return { loaderError: { status: 400, message: error.message } };
+        return json({ error: { status: 400, message: error.message } });
       }
     }
     default: {
-      return { error: { status: 405, message: "Method Not Allowed" } };
+      return json({ error: { status: 405, message: "Method Not Allowed" } });
     }
   }
 }
@@ -65,9 +72,10 @@ export default function SingleApplicantsPage() {
   const navigation = useNavigation();
   const isSubmitting = navigation.state === "submitting";
   const actionData = useActionData<typeof action>();
+  const error = useActionData() as unknown as GenericError | undefined;
 
   useEffect(() => {
-    if (actionData?.deleted) {
+    if (isDeleted(actionData)) {
       resetDeleteState();
     }
   }, [actionData]);
@@ -114,7 +122,10 @@ export default function SingleApplicantsPage() {
           <div className="my-10 flex flex-col rounded-lg border border-gray-600 p-4 sm:flex-row">
             <div className="p-2">
               <img
-                src={applicant.pictureUrl || "https://via.placeholder.com/150"}
+                src={
+                  applicant.pictureUrl ||
+                  "https://via.placeholder.com/150?Text=No Photo Available"
+                }
                 alt="Applicant"
                 className="w-96 rounded-lg"
               />
@@ -172,7 +183,8 @@ export default function SingleApplicantsPage() {
                   </button>
                 )}
               </Form>
-              {actionData?.error && (
+
+              {isError(actionData) && (
                 <div className="mt-6">
                   <div
                     className="mb-4 flex rounded-lg bg-red-50 p-4 text-sm text-red-800 dark:bg-gray-800 dark:text-red-400"
@@ -194,7 +206,7 @@ export default function SingleApplicantsPage() {
                     <span className="sr-only">Info</span>
                     <div>
                       <span className="font-medium">Error:</span>{" "}
-                      {actionData.error.message}
+                      {isError(actionData) && actionData.error.message}
                     </div>
                   </div>
                 </div>

@@ -1,9 +1,11 @@
+import type { GenericError } from '~/types';
 import dayjs from 'dayjs';
 import relativeTime from 'dayjs/plugin/relativeTime';
 import { useMatches } from "@remix-run/react";
 import { useMemo } from "react";
 
 import type { User } from "~/models/user.server";
+import type { ReviewByUser } from './models/review.server';
 
 const DEFAULT_REDIRECT = "/";
 
@@ -76,3 +78,15 @@ export const dateToTimeAgo = (date: string | Date) => {
   dayjs.extend(relativeTime);
   return dayjs(date).fromNow();
 };
+
+export const isDeleted = (data: any): data is { deleted: boolean } => {
+  return data && 'deleted' in data;
+};
+
+export const isError = (data: any): data is GenericError => {
+  return data && 'error' in data;
+}
+
+export const isReviewArrayInData = (data: any): data is ReviewByUser[] => {
+  return data && 'reviews' in data;
+}

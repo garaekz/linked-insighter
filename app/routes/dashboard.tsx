@@ -2,6 +2,7 @@ import type { LoaderArgs } from "@remix-run/node";
 import { Outlet, useLoaderData } from "@remix-run/react";
 import { authenticator } from "~/services/auth.server";
 import RootNavbar from "~/components/navbar.component";
+import type { User } from "@prisma/client";
 
 export const loader = async ({ request, params }: LoaderArgs) => {
   const user = await authenticator.isAuthenticated(request, {
@@ -12,11 +13,11 @@ export const loader = async ({ request, params }: LoaderArgs) => {
 };
 
 export default function DashboardRoot() {
-  const { user } = useLoaderData<typeof loader>();
+  const { user } = useLoaderData() as unknown as { user: User };
 
   return (
     <div className="bg-white dark:bg-gray-900 min-h-screen">
-    <RootNavbar user={user!} />
+    <RootNavbar user={user} />
     <Outlet />
     <footer className="bg-white p-4 dark:bg-gray-800 sm:p-6">
         <div className="mx-auto max-w-screen-xl">

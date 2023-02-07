@@ -26,7 +26,7 @@ export async function getReviewsByApplicantUsername(
   });
 }
 
-export async function getReviewsByUser({ userId }: { userId: User["id"] }): Promise<ReviewByUser[]> {
+export async function getReviewsByUser(userId: User["id"]): Promise<ReviewByUser[]> {
   return prisma.review.findMany({
     where: { userId },
     orderBy: { createdAt: "desc" },

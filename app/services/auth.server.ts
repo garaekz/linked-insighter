@@ -3,8 +3,9 @@ import { Authenticator } from "remix-auth";
 import { sessionStorage } from "~/services/session.server";
 import { GitHubStrategy } from "remix-auth-github";
 import { prisma } from "~/db.server";
+import type { User } from '@prisma/client';
 
-export const authenticator = new Authenticator(sessionStorage);
+export const authenticator = new Authenticator<User>(sessionStorage);
 
 const getCallback = (provider: string) => {
   return `http://localhost:3000/auth/${provider}/callback`

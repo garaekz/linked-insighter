@@ -1,32 +1,35 @@
-import type { LoaderArgs, MetaFunction } from "@remix-run/server-runtime";
-import { useLoaderData } from "react-router";
-import { deleteReview, ReviewByUser } from "~/models/review.server";
+import type { ActionArgs, LoaderArgs, MetaFunction } from "@remix-run/server-runtime";
+import { json } from "@remix-run/server-runtime";
+import type { ReviewByUser } from "~/models/review.server";
+import { deleteReview } from "~/models/review.server";
 import { getReviewsByUser } from "~/models/review.server";
 import { authenticator } from "~/services/auth.server";
-import { dateToTimeAgo } from "~/utils";
+import { dateToTimeAgo, isDeleted, isError } from "~/utils";
 import { BsFillEyeFill, BsFillTrashFill } from "react-icons/bs";
-import { Link, useActionData, useSubmit } from "@remix-run/react";
+import { Link, useActionData, useLoaderData, useSubmit } from "@remix-run/react";
 import { Fragment, useEffect, useState } from "react";
 import { Dialog, Transition } from "@headlessui/react";
 
-export const loader = async ({ request, params }: LoaderArgs) => {
+export const loader = async ({ request }: LoaderArgs) => {
   try {
-    const user = await authenticator.isAuthenticated(request);
+    const user = await authenticator.isAuthenticated(request, {
+      failureRedirect: "/login",
+    });
     const reviews = await getReviewsByUser(user.id);
-    return { reviews };
+    return json({ reviews });
   } catch (error: any) {
-    return { error: { status: 400, message: error.message } };
+    return json({ error: {status: 400, message: error.message} });
   }
 };
 
-export const action = async ({ request, params }: LoaderArgs) => {
+export const action = async ({ request }: ActionArgs) => {
   try {
     const form = await request.formData();
     const reviewId = form.get("reviewId") as string;
     await deleteReview(reviewId);
-    return { deleted: true }
+    return json({ deleted: true })
   } catch (error: any) {
-    return { loaderError: { status: 400, message: error.message } };
+    return json({ error: {status: 400, message: error.message} });
   }
 };
 
@@ -40,11 +43,12 @@ export default function MySearchesPage() {
   const submit = useSubmit();
   const [deletingReview, setDeletingReview] = useState("");
   const [isDeleting, setIsDeleting] = useState(false);
-  const { reviews, error } = useLoaderData<typeof loader>();
   const actionData = useActionData<typeof action>();
+  const loaderData = useLoaderData<typeof loader>();
+  const reviews = useLoaderData() as unknown as { reviews: ReviewByUser[] } | undefined;
 
   useEffect(() => {
-    if (actionData?.deleted) {
+    if (isDeleted(actionData)) {
       resetDeleteState();
     }
   }, [actionData]);
@@ -65,19 +69,21 @@ export default function MySearchesPage() {
     submit(form, { method: "delete" });
   }
 
-  if (error) {
+  if (isError(loaderData) || isError(actionData)) {
+    const actionErrorMessage = isError(actionData) && actionData.error.message;
+    const loadedrErrorMessage = isError(loaderData) && loaderData.error.message;
     return (
       <div className="flex min-h-screen flex-col py-8 sm:items-center sm:justify-center">
         <div className="sm:max-w-8xl mx-auto w-full px-8">
           <h1 className="my-4 text-center font-montserrat text-2xl font-extrabold text-gray-200 sm:my-10 sm:text-left sm:text-5xl">
-            {error}
+            { actionErrorMessage || loadedrErrorMessage }
           </h1>
         </div>
       </div>
     );
   }
 
-  if (!reviews || reviews.length === 0) {
+  if (Array.isArray(loaderData) && loaderData[0] && 'reviews' in loaderData[0]) {
     return (
       <div className="flex h-screen items-center">
         <div className="flex flex-col space-y-4">
@@ -123,7 +129,7 @@ export default function MySearchesPage() {
                       </tr>
                     </thead>
                     <tbody>
-                      {reviews.map((review: ReviewByUser) => (
+                      {reviews && reviews.reviews.map((review) => (
                         <tr
                           key={review.id}
                           className="border-b hover:bg-gray-100 dark:border-gray-600 dark:hover:bg-gray-700"
@@ -135,7 +141,7 @@ export default function MySearchesPage() {
                             <img
                               src={
                                 review.applicant.pictureUrl ||
-                                "https://via.placeholder.com/150"
+                                "https://via.placeholder.com/150?Text=No Photo Available"
                               }
                               alt={review.applicant.name}
                               className="mr-3 h-8 w-auto rounded-full"
