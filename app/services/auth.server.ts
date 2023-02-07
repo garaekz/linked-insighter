@@ -8,8 +8,8 @@ import type { User } from '@prisma/client';
 export const authenticator = new Authenticator<User>(sessionStorage);
 const baseUrl = process.env.REDIRECT_BASE_URL || "http://localhost:3000";
 const getCallback = (provider: string) => {
-  return `${baseUrl}/${provider}/callback`
-} 
+  return `${baseUrl}/auth/${provider}/callback`
+}
 
 const gitHubStrategy = new GitHubStrategy(
   {
