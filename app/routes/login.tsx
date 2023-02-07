@@ -4,6 +4,7 @@ import type { ActionArgs, LoaderArgs, MetaFunction } from "@remix-run/node";
 import { authenticator } from "~/services/auth.server";
 import { MultiSocialButtons } from "~/components/social-button.component";
 import { useActionData } from "@remix-run/react";
+import { DynamicLogo } from "~/components/logo.component";
 
 export async function loader({ request }: LoaderArgs) {
   const user = await authenticator.isAuthenticated(request);
@@ -32,12 +33,7 @@ export default function LoginPage() {
         <div className="max-w-4xl w-full mx-auto px-6 py-24 lg:py-32">
           <div className="lg:flex">
             <div className="lg:w-1/2">
-              <img
-                className="h-7 w-auto sm:h-8"
-                src="/loguito.svg"
-                alt=""
-              />
-
+              <DynamicLogo className="h-7 w-auto sm:h-8 text-gray-800 dark:text-gray-200" />
               <h1 className="mt-4 text-gray-600 dark:text-gray-300 md:text-lg">
                 Welcome back
               </h1>

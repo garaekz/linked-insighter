@@ -119,11 +119,11 @@ export default function DashboardIndexPage() {
     <>
       <div className="flex min-h-screen flex-col py-8 sm:py-36">
         <div className="mx-auto w-full px-8 sm:max-w-3xl">
-          <h1 className="my-4 text-center font-montserrat text-2xl font-extrabold text-gray-200 sm:my-10 sm:text-left sm:text-5xl">
-            Unlock your <span className="text-cyan-400">LinkedIn Insights</span>{" "}
+          <h1 className="my-4 text-center font-montserrat text-2xl font-extrabold text-gray-700 dark:text-gray-200 sm:my-10 sm:text-left sm:text-5xl">
+            Unlock your <span className="dark:text-cyan-400 text-violet-800">LinkedIn Insights</span>{" "}
             with a single search
           </h1>
-          <p className="mb-6 text-gray-400 sm:text-lg">
+          <p className="mb-6 dark:text-gray-400 text-slate-600 sm:text-lg">
             Get a personalized analysis of your LinkedIn profile and take
             control of your career with our cutting-edge AI tool.
           </p>
@@ -147,7 +147,7 @@ export default function DashboardIndexPage() {
                 placeholder="https://linkedin.com/in/exampleuser or exampleuser"
               />
             </div>
-            <small className="text-xs font-extralight text-gray-400">
+            <small className="text-xs font-base dark:text-gray-400 text-slate-600">
               Enter your LinkedIn profile URL in the search bar, like:{" "}
               <strong>https://linkedin.com/in/myusername</strong> or just the{" "}
               <strong>myusername</strong> part

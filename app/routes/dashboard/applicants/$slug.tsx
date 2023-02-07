@@ -106,20 +106,20 @@ export default function SingleApplicantsPage() {
 
   return (
     <>
-      <div className="mx-auto mt-20 w-full max-w-5xl px-4 dark:text-gray-200">
+      <div className="mx-auto mt-20 w-full max-w-5xl px-4 text-slate-800 dark:text-gray-200">
         <div className="sm:w-2/3">
           <h1 className="text-3xl">
             Hi{" "}
-            <span className="font-bold text-cyan-300">
+            <span className="font-bold dark:text-cyan-300 text-violet-900">
               {" "}
               {user.username ? `@${user.username}` : user.name}!,{" "}
             </span>{" "}
             this is what I found about{" "}
-            <span className="font-bold italic text-cyan-300">
+            <span className="font-bold italic dark:text-cyan-300 text-violet-900">
               {applicant.name}
             </span>
           </h1>
-          <div className="my-10 flex flex-col rounded-lg border border-gray-600 p-4 sm:flex-row">
+          <div className="my-10 flex flex-col rounded-lg border border-gray-300 dark:border-gray-600 p-4 sm:flex-row">
             <div className="p-2">
               <img
                 src={
@@ -131,16 +131,16 @@ export default function SingleApplicantsPage() {
               />
             </div>
             <div className="flex flex-col p-2 font-medium">
-              <h4 className="text-2xl font-semibold text-gray-300">
+              <h4 className="text-2xl font-semibold text-slate-800 dark:text-gray-400">
                 {applicant.name}{" "}
                 {applicant.username ? ` (@${applicant.username})` : ""}
               </h4>
-              <p className="text-sm font-light">{applicant.headline}</p>
+              <p className="text-sm font-base text-slate-800 dark:text-gray-300 dark:font-light">{applicant.headline}</p>
               <div className="mt-10 flex flex-wrap">
                 {applicant.skills.slice(0, 5).map((skill) => (
                   <span
                     key={skill.id}
-                    className="mx-2 my-1 rounded-lg bg-gray-600 p-2 text-sm font-light"
+                    className="mx-2 my-1 rounded-lg bg-gray-400 dark:bg-gray-600 p-2 text-sm dark:font-light"
                   >
                     {skill.name}
                   </span>
@@ -221,7 +221,7 @@ export default function SingleApplicantsPage() {
             </h1>
           </div>
         ) : (
-          <h1 className="text-2xl font-semibold text-gray-300">
+          <h1 className="text-2xl font-semibold text-slate-800 dark:text-gray-300">
             Reviews ({applicant.reviews.length})
           </h1>
         )}
@@ -229,14 +229,14 @@ export default function SingleApplicantsPage() {
           <div
             key={review.id}
             id={review.id}
-            className="my-5 flex w-full flex-col rounded-lg border border-gray-600 p-4"
+            className="my-5 flex w-full flex-col rounded-lg border border-gray-300 dark:border-gray-600 p-4"
           >
             <div className="mb-8 flex w-full justify-between">
               <span>Created {dateToTimeAgo(review.createdAt)}</span>
               {review.userId === user.id && (
                 <button
                   onClick={() => confirmDelete(review.id)}
-                  className="text-sm text-red-500 hover:text-red-600"
+                  className="text-sm text-white dark:bg-transparent bg-red-500 px-4 py-2 rounded-md dark:text-red-500 hover:text-red-100 hover:bg-red-700 dark:hover:bg-transparent dark:hover:text-red-600"
                 >
                   Delete
                 </button>
@@ -244,7 +244,7 @@ export default function SingleApplicantsPage() {
             </div>
             <div className="flex flex-col gap-2">
               {review.content.split("\n").map((line, index) => (
-                <p key={index} className="text-sm font-light">
+                <p key={index} className="text-sm dark:font-light">
                   {line}
                 </p>
               ))}

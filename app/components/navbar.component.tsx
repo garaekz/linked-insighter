@@ -1,6 +1,7 @@
 import type { User } from "@prisma/client";
 import { Form, Link, useMatches } from "@remix-run/react";
 import { Dropdown, Navbar, Avatar } from "flowbite-react";
+import { DynamicLogo } from "./logo.component";
 
 export default function RootNavbar({ user }: { user: User }) {
   const matches = useMatches();
@@ -8,11 +9,7 @@ export default function RootNavbar({ user }: { user: User }) {
   return (
     <Navbar fluid={true} className="sm:px-10">
       <Navbar.Brand href="/dashboard">
-        <img
-          src="/loguito.svg"
-          className="mr-3 h-6 sm:h-9 p-1.5"
-          alt="Logo"
-        />
+        <DynamicLogo className="mr-3 h-6 sm:h-9 p-1.5 text-gray-800 dark:text-gray-200" />
       </Navbar.Brand>
       {user ? (
         <div className="flex md:order-2">
@@ -52,19 +49,19 @@ export default function RootNavbar({ user }: { user: User }) {
       <Navbar.Collapse>
         <Link
           to="/"
-          className="font-semibold text-gray-800 hover:text-gray-900 dark:text-gray-400 dark:hover:text-gray-200"
+          className="font-semibold text-gray-800 hover:text-gray-500 hover:text-gray-900 dark:text-gray-400 dark:hover:text-gray-200"
         >
           Home
         </Link>
         <Link
           to="/dashboard"
-          className={`${pathname === '/dashboard/' ? 'font-bold text-gray-800 text-cyan-400':'text-gray-800 hover:text-gray-900 dark:text-gray-400 dark:hover:text-gray-200 font-semibold'  }`}
+          className={`${pathname === '/dashboard/' ? 'font-bold dark:text-gray-800 dark:hover:text-gray-500 text-violet-900 dark:text-cyan-400':'text-gray-800 hover:text-gray-900 dark:text-gray-400 dark:hover:text-gray-200 font-semibold'  }`}
         >
           New Search
         </Link>
         <Link
           to="/dashboard/my-searches"
-          className={`${pathname === '/dashboard/my-searches' ? 'font-bold text-gray-800 text-cyan-400':'text-gray-800 hover:text-gray-900 dark:text-gray-400 dark:hover:text-gray-200 font-semibold'  }`}
+          className={`${pathname === '/dashboard/my-searches' ? 'font-bold dark:text-gray-800 dark:hover:text-gray-500 text-violet-900 dark:text-cyan-400':'text-gray-800 hover:text-gray-900 dark:text-gray-400 dark:hover:text-gray-200 font-semibold'  }`}
         >
           My Searches
         </Link>

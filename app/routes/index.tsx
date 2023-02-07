@@ -1,17 +1,12 @@
 import { Link } from "@remix-run/react";
+import { DynamicLogo } from "~/components/logo.component";
 
 export default function Index() {
   return (
     <main className="relative min-h-screen bg-white bg-white dark:bg-gray-900 sm:flex-col sm:items-center sm:justify-center">
       <section className="pt-16 pb-10">
         <div className="mx-auto max-w-screen-xl py-8 px-4 text-center lg:py-16 lg:px-12">
-        <svg className="mx-auto h-12 w-auto my-20" width="86" height="60" viewBox="0 0 86 60" fill="none" xmlns="http://www.w3.org/2000/svg">
-        <path d="M48.8622 14.0482C50.3539 12.5592 51.2808 10.5026 51.2808 8.23242C51.2808 3.68597 47.5731 0 43 0C40.1087 0 37.5674 1.47683 36.088 3.71038C35.6952 4.10095 2.73159 44.4941 2.42466 44.9579C0.933013 46.4469 0.00610352 48.5035 0.00610352 50.7737C0.00610352 55.3201 3.71374 59.0061 8.2869 59.0061C11.1781 59.0061 13.7195 57.5293 15.1988 55.2957C15.5917 54.9052 48.5553 14.512 48.8622 14.0482Z" fill="white"/>
-        <path d="M67.9344 33.2104C69.4322 31.7213 70.3591 29.6648 70.3591 27.3885C70.3591 22.842 66.6515 19.1561 62.0783 19.1561C59.1871 19.1561 56.6458 20.6329 55.1603 22.8665C54.7613 23.2631 37.4508 44.4758 37.1377 44.9457C35.6399 46.4347 34.713 48.4913 34.713 50.7676C34.713 55.314 38.4207 59 42.9938 59C45.885 59 48.4264 57.5232 49.9119 55.2896C50.3109 54.8929 67.6214 33.6803 67.9344 33.2104Z" fill="white"/>
-        <path d="M86 8.23242C86 12.7789 82.2923 16.4648 77.7192 16.4648C73.146 16.4648 69.4384 12.7789 69.4384 8.23242C69.4384 3.68597 73.146 0 77.7192 0C82.2923 0 86 3.68597 86 8.23242Z" fill="white"/>
-        <path d="M16.5616 8.23242C16.5616 12.7789 12.854 16.4648 8.2808 16.4648C3.70764 16.4648 0 12.7789 0 8.23242C0 3.68597 3.70764 0 8.2808 0C12.854 0 16.5616 3.68597 16.5616 8.23242Z" fill="white"/>
-        </svg>
-
+          <DynamicLogo className="mx-auto h-12 w-auto my-20 text-gray-800 dark:text-gray-200" />
           {/* <img src="/loguito.svg" alt="Linked Insighter" className=" /> */}
           <h1 className="mb-4 text-4xl font-extrabold leading-none tracking-tight text-gray-900 dark:text-white md:text-5xl lg:text-6xl">
             Unlock Your LinkedIn Potential <br /> with AI-Powered Insights

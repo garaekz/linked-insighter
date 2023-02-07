@@ -16,7 +16,7 @@ export default function DashboardRoot() {
   const { user } = useLoaderData() as unknown as { user: User };
 
   return (
-    <div className="bg-white dark:bg-gray-900 min-h-screen">
+    <div className="bg-gray-200 dark:bg-gray-900 min-h-screen">
     <RootNavbar user={user} />
     <Outlet />
     <footer className="bg-white p-4 dark:bg-gray-800 sm:p-6">
