@@ -26,13 +26,12 @@ export const meta: MetaFunction = () => {
 
 export default function LoginPage() {
   const actionData = useActionData<typeof action>();
-  console.log(actionData);
   return (
     <div className="flex flex-col justify-center min-h-full bg-white dark:bg-gray-900">
       <section>
         <div className="max-w-4xl w-full mx-auto px-6 py-24 lg:py-32">
           <div className="lg:flex">
-            <div className="lg:w-1/2">
+            <div className="flex flex-col items-center sm:items-start justify-center  w-full lg:w-1/2">
               <DynamicLogo className="h-7 w-auto sm:h-8 text-gray-800 dark:text-gray-200" />
               <h1 className="mt-4 text-gray-600 dark:text-gray-300 md:text-lg">
                 Welcome back

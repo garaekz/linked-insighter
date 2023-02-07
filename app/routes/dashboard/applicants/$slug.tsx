@@ -4,6 +4,8 @@ import {
   useNavigation,
   useActionData,
   useSubmit,
+  useCatch,
+  useParams,
 } from "@remix-run/react";
 import type { ActionArgs, LoaderArgs } from "@remix-run/server-runtime";
 import { json } from "@remix-run/server-runtime";
@@ -18,14 +20,13 @@ import { Dialog, Transition } from "@headlessui/react";
 import type { GenericError } from "~/types";
 
 export async function loader({ request, params }: LoaderArgs) {
-  const user = await authenticator.isAuthenticated(request);
   const { slug } = params;
-  const applicant = await getApplicantByUsername(slug as string);
-
-  if (!applicant || !user) {
-    return { applicant: null, user: null };
+  const result = await getApplicantByUsername(slug as string);
+  if (!result) {
+    return redirect("/dashboard");
   }
-  return { applicant, user };
+  const user = await authenticator.isAuthenticated(request);
+  return { applicant: result, user };
 }
 
 export async function action({ request, params }: ActionArgs) {
@@ -45,7 +46,7 @@ export async function action({ request, params }: ActionArgs) {
         await createReview(review.body.generations[0].text, user.id, result.id);
         return redirect(`/dashboard/applicants/${slug}`);
       } catch (error: any) {
-        return json({ error: { status: 400, message: error.message } });
+        throw error;
       }
     }
     case "DELETE": {
@@ -72,7 +73,7 @@ export default function SingleApplicantsPage() {
   const navigation = useNavigation();
   const isSubmitting = navigation.state === "submitting";
   const actionData = useActionData<typeof action>();
-  const error = useActionData() as unknown as GenericError | undefined;
+  // const error = useActionData() as unknown as GenericError | undefined;
 
   useEffect(() => {
     if (isDeleted(actionData)) {
@@ -96,14 +97,6 @@ export default function SingleApplicantsPage() {
     submit(form, { method: "delete" });
   };
 
-  if (!applicant || !user) {
-    return (
-      <div>
-        <h1 className="text-3xl">An error occurred, please try again later.</h1>
-      </div>
-    );
-  }
-
   return (
     <>
       <div className="mx-auto mt-20 w-full max-w-5xl px-4 text-slate-800 dark:text-gray-200">
@@ -112,7 +105,7 @@ export default function SingleApplicantsPage() {
             Hi{" "}
             <span className="font-bold dark:text-cyan-300 text-violet-900">
               {" "}
-              {user.username ? `@${user.username}` : user.name}!,{" "}
+              {user?.username ? `@${user.username}` : user?.name}!,{" "}
             </span>{" "}
             this is what I found about{" "}
             <span className="font-bold italic dark:text-cyan-300 text-violet-900">
@@ -233,7 +226,7 @@ export default function SingleApplicantsPage() {
           >
             <div className="mb-8 flex w-full justify-between">
               <span>Created {dateToTimeAgo(review.createdAt)}</span>
-              {review.userId === user.id && (
+              {review.userId === user?.id && (
                 <button
                   onClick={() => confirmDelete(review.id)}
                   className="text-sm text-white dark:bg-transparent bg-red-500 px-4 py-2 rounded-md dark:text-red-500 hover:text-red-100 hover:bg-red-700 dark:hover:bg-transparent dark:hover:text-red-600"
@@ -352,4 +345,4 @@ export default function SingleApplicantsPage() {
       </Transition>
     </>
   );
-}
+};
