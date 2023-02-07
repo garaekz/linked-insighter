@@ -3,6 +3,7 @@ import type { ActionArgs, LoaderArgs, MetaFunction } from "@remix-run/node";
 
 import { authenticator } from "~/services/auth.server";
 import { MultiSocialButtons } from "~/components/social-button.component";
+import { useActionData } from "@remix-run/react";
 
 export async function loader({ request }: LoaderArgs) {
   const user = await authenticator.isAuthenticated(request);
@@ -11,7 +12,9 @@ export async function loader({ request }: LoaderArgs) {
 }
 
 export const action = ({ request, params }: ActionArgs) => {
-  return authenticator.authenticate(params.provider!, request);
+  const { provider } = params;
+  if (!provider) return { error: { status: 400, message: "This provider is not supported"}}
+  return authenticator.authenticate(provider, request);
 };
 
 export const meta: MetaFunction = () => {
@@ -21,6 +24,8 @@ export const meta: MetaFunction = () => {
 };
 
 export default function LoginPage() {
+  const actionData = useActionData<typeof action>();
+  console.log(actionData);
   return (
     <div className="flex flex-col justify-center min-h-full bg-white dark:bg-gray-900">
       <section>

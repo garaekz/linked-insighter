@@ -18,20 +18,24 @@ const gitHubStrategy = new GitHubStrategy(
     callbackURL: getCallback(SocialsProvider.GITHUB),
   },
   async ({ profile }) => {
-    const user = await prisma.user.upsert({
-      where: {
-        email: profile.emails![0].value,
-      },
-      update: {},
-      create: {
-        email: profile.emails![0].value,
-        name: profile.name!.givenName,
-        avatarUrl: profile.photos![0].value,
-        username: profile.displayName,
-        githubId: profile.id,
-      },
-    });
-    return user;
+    try {
+      const user = await prisma.user.upsert({
+        where: {
+          email: profile.emails![0].value,
+        },
+        update: {},
+        create: {
+          email: profile.emails![0].value,
+          name: profile.name!.givenName,
+          avatarUrl: profile.photos![0].value,
+          username: profile.displayName,
+          githubId: profile.id,
+        },
+      });
+      return user;
+    } catch (error) {
+      throw error;
+    }
   }
 );
 
