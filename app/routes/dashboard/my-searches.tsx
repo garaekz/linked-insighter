@@ -106,7 +106,7 @@ export default function MySearchesPage() {
                   <div className="flex flex-1 items-center space-x-4">
                     <h5>
                       <span className="text-gray-500">Total Insights:</span>
-                      <span className="dark:text-white"> {reviews.length}</span>
+                      <span className="dark:text-white"> {reviews?.reviews.length}</span>
                     </h5>
                   </div>
                 </div>
