@@ -24,10 +24,10 @@ Yo elegí reutilizar un repo que tenía apenas iniciado con autenticación socia
 <a href='./landing-screenshot.png' target='_blank'>
 <img width='30%' src='./landing-screenshot.png' />
 </a>
-<a href='./landing-screenshot.png' target='_blank'>
+<a href='./search-screenshot.png' target='_blank'>
 <img width='30%' src='./search-screenshot.png' />
 </a>
-<a href='./landing-screenshot.png' target='_blank'>
+<a href='./profile-screenshot.png' target='_blank'>
 <img width='30%' src='./profile-screenshot.png' />
 </a>
 
