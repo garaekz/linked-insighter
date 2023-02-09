@@ -1,5 +1,6 @@
 {
-  "name": "blogmix-b58b",
+  "name": "linked-insighter",
+  "version": "0.3.0",
   "private": true,
   "sideEffects": false,
   "scripts": {
