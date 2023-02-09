@@ -4,7 +4,7 @@ import type { ReviewByUser } from "~/models/review.server";
 import { deleteReview } from "~/models/review.server";
 import { getReviewsByUser } from "~/models/review.server";
 import { authenticator } from "~/services/auth.server";
-import { dateToTimeAgo, isDeleted, isError } from "~/utils";
+import { dateToTimeAgo, isValidAction, isError } from "~/utils";
 import { BsFillEyeFill, BsFillTrashFill } from "react-icons/bs";
 import { Link, useActionData, useLoaderData, useSubmit } from "@remix-run/react";
 import { Fragment, useEffect, useState } from "react";
@@ -48,7 +48,7 @@ export default function MySearchesPage() {
   const reviews = useLoaderData() as unknown as { reviews: ReviewByUser[] } | undefined;
 
   useEffect(() => {
-    if (isDeleted(actionData)) {
+    if (isValidAction(actionData, "deleted")) {
       resetDeleteState();
     }
   }, [actionData]);

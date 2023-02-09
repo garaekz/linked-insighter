@@ -79,8 +79,8 @@ export const dateToTimeAgo = (date: string | Date) => {
   return dayjs(date).fromNow();
 };
 
-export const isDeleted = (data: any): data is { deleted: boolean } => {
-  return data && 'deleted' in data;
+export const isValidAction = (data: any, type: string) => {
+  return data && type in data;
 };
 
 export const isError = (data: any): data is GenericError => {

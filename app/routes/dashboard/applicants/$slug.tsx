@@ -14,11 +14,12 @@ import { getApplicantByUsername } from "~/models/applicant.server";
 import { createReview, deleteReview } from "~/models/review.server";
 import { authenticator } from "~/services/auth.server";
 import { extractPayloadData, generateReview } from "~/services/cohere.server";
-import { dateToTimeAgo, isDeleted, isError } from "~/utils";
+import { dateToTimeAgo, isValidAction, isError } from "~/utils";
 import { Fragment, useEffect, useState } from "react";
 import { Dialog, Transition } from "@headlessui/react";
-import type { Review, User } from "@prisma/client";
+import type { User } from "@prisma/client";
 import type { ApplicantWithRelations } from "~/models/applicant.server";
+import { ToastContainer, toast } from "react-toastify";
 
 export async function loader({ request, params }: LoaderArgs) {
   const { slug } = params;
@@ -45,7 +46,7 @@ export async function action({ request, params }: ActionArgs) {
           failureRedirect: "/login",
         });
         await createReview(review.body.generations[0].text, user.id, result.id);
-        return redirect(`/dashboard/applicants/${slug}`);
+        return {success: true};
       } catch (error: any) {
         throw error;
       }
@@ -75,11 +76,32 @@ export default function SingleApplicantsPage() {
   const actionData = useActionData<typeof action>();
   const user = useLoaderData<{ user: User }>().user;
   const applicant = useLoaderData<{ applicant: ApplicantWithRelations }>().applicant;
-  // const error = useActionData() as unknown as GenericError | undefined;
 
   useEffect(() => {
-    if (isDeleted(actionData)) {
+    if (isValidAction(actionData, "deleted")) {
       resetDeleteState();
+      toast.success('🔥 We deleted that entry successfully!', {
+        position: "top-right",
+        autoClose: 5000,
+        hideProgressBar: false,
+        closeOnClick: true,
+        pauseOnHover: true,
+        draggable: true,
+        progress: undefined,
+        theme: "colored",
+      });
+    }
+    if (isValidAction(actionData, "success")) {
+      toast.success('🚀 Analyzed! Check below the newest analysis!', {
+        position: "top-right",
+        autoClose: 5000,
+        hideProgressBar: false,
+        closeOnClick: true,
+        pauseOnHover: true,
+        draggable: true,
+        progress: undefined,
+        theme: "colored",
+      });
     }
   }, [actionData]);
 
@@ -101,6 +123,7 @@ export default function SingleApplicantsPage() {
 
   return (
     <>
+      <ToastContainer />
       <div className="mx-auto mt-20 w-full max-w-5xl px-4 text-slate-800 dark:text-gray-200">
         <div className="sm:w-2/3">
           <h1 className="text-3xl">
@@ -217,7 +240,7 @@ export default function SingleApplicantsPage() {
           </div>
         ) : (
           <h1 className="text-2xl font-semibold text-slate-800 dark:text-gray-300">
-            Reviews ({applicant.reviews.length})
+            Analyses ({applicant.reviews.length})
           </h1>
         )}
         {applicant.reviews.map((review: any) => (

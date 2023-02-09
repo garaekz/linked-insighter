@@ -19,17 +19,16 @@ import { createReview } from "~/models/review.server";
 import { authenticator } from "~/services/auth.server";
 import type { GenericError } from "~/types";
 
-const urlRegex = /https:\/\/www\.linkedin\.com\/in\/(.*)\//;
-
 export const meta: MetaFunction = () => {
   return {
     title: "Linked Insighter | Dashboard Home",
   };
 };
 
-const getSlugFromUrl = (url: string) => {
-  const match = url.match(urlRegex);
-  return match ? match[1] : null;
+const getSlugFromUrl = (url: string | null) => {
+  if(!url || url === "") return null;
+  const match = url.match(/linkedin.com\/in\/(.*)/);
+  return match ? match[1].trim().replace(/[^a-zA-Z0-9-_]/g, '') : url;
 };
 
 export async function action({ request }: ActionArgs) {
@@ -40,13 +39,11 @@ export async function action({ request }: ActionArgs) {
       throw new Error("Please enter a valid LinkedIn profile URL or username");
     }
 
-    if (slug.match(urlRegex)) {
-      slug = getSlugFromUrl(slug as string);
-      if (!slug) {
-        throw new Error(
-          "Please enter a valid LinkedIn profile URL or username"
-        );
-      }
+    slug = getSlugFromUrl(slug as string);
+    if (!slug) {
+      throw new Error(
+        "Please enter a valid LinkedIn profile URL or username"
+      );
     }
 
     const applicant = await getApplicantByUsername(slug as string);
@@ -63,12 +60,16 @@ export async function action({ request }: ActionArgs) {
     await createReview(review.body.generations[0].text, user.id, result.id);
     return redirect(`/dashboard/applicants/${slug}`);
   } catch (error: any) {
-    return { error: { status: 400, message: error.message } };
+    if (error.message === "Failed to fetch profile") {
+      return { error: { status: 400, message: `We weren't able to get the profile you requested, check the LinkedIn URL or username you provided and try again.` } };
+    }
+
+    return { error: { status: 500, message: 'An unknow server error occurred!' } };
   }
 }
 
 export default function DashboardIndexPage() {
-  const [slug, setSlug] = useState("");
+  const [slug, setSlug] = useState<string | null>(null);
   const [searchParams] = useSearchParams();
   const redirectTo = searchParams.get("redirectTo") || "/notes";
   const slugRef = React.useRef<HTMLInputElement>(null);
@@ -77,43 +78,8 @@ export default function DashboardIndexPage() {
   const error =  useActionData() as unknown as GenericError;
 
   useEffect(() => {
-    if (slug.match(urlRegex)) {
-      const parsedSlug = getSlugFromUrl(slug);
-      if (parsedSlug) {
-        setSlug(parsedSlug);
-      }
-    }
+    setSlug(getSlugFromUrl(slug));
   }, [slug]);
-
-  if (error?.error.message) {
-    return (
-      <div className="mt-6">
-        <div
-          className="mb-4 flex rounded-lg bg-red-50 p-4 text-sm text-red-800 dark:bg-gray-800 dark:text-red-400"
-          role="alert"
-        >
-          <svg
-            aria-hidden="true"
-            className="mr-3 inline h-5 w-5 flex-shrink-0"
-            fill="currentColor"
-            viewBox="0 0 20 20"
-            xmlns="http://www.w3.org/2000/svg"
-          >
-            <path
-              fillRule="evenodd"
-              d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-7-4a1 1 0 11-2 0 1 1 0 012 0zM9 9a1 1 0 000 2v3a1 1 0 001 1h1a1 1 0 100-2v-3a1 1 0 00-1-1H9z"
-              clipRule="evenodd"
-            ></path>
-          </svg>
-          <span className="sr-only">Info</span>
-          <div>
-            <span className="font-medium">Error:</span>{" "}
-            {error.error.message}
-          </div>
-        </div>
-      </div>
-    );
-  }
 
   return (
     <>
@@ -180,18 +146,45 @@ export default function DashboardIndexPage() {
               </button>
             ) : (
               <button
-                disabled={isSubmitting || slug.length === 0}
+                disabled={isSubmitting || !slug}
                 type="submit"
                 className={`${
-                  slug.length === 0
-                    ? "border border-gray-200 bg-white py-2.5 px-5 font-medium text-gray-900 focus:z-10 focus:text-blue-700 focus:ring-2 focus:ring-blue-700 dark:border-gray-600 dark:bg-gray-800 dark:text-gray-400"
-                    : "bg-violet-700 text-gray-200 hover:bg-violet-800 focus:bg-violet-600"
-                } w-full rounded-lg py-3 px-4 font-bold`}
+                  slug
+                    ? "bg-violet-700 text-gray-200 hover:bg-violet-800 focus:bg-violet-600"
+                    : "border border-gray-200 bg-white py-2.5 px-5 text-gray-900 focus:z-10 focus:text-blue-700 focus:ring-2 focus:ring-blue-700 dark:border-gray-600 dark:bg-gray-800 dark:text-gray-400"
+                } w-full rounded-lg py-3 px-4  font-medium`}
               >
-                Analyze this LinkedIn Profile
+                Analyze { slug && <span className="font-bold">{slug}'s</span>} LinkedIn Profile
               </button>
             )}
           </Form>
+          {error && (
+            <div className="mt-6">
+            <div
+              className="mb-4 flex rounded-lg bg-red-50 p-4 text-sm text-red-800 dark:bg-gray-800 dark:text-red-400"
+              role="alert"
+            >
+              <svg
+                aria-hidden="true"
+                className="mr-3 inline h-5 w-5 flex-shrink-0"
+                fill="currentColor"
+                viewBox="0 0 20 20"
+                xmlns="http://www.w3.org/2000/svg"
+              >
+                <path
+                  fillRule="evenodd"
+                  d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-7-4a1 1 0 11-2 0 1 1 0 012 0zM9 9a1 1 0 000 2v3a1 1 0 001 1h1a1 1 0 100-2v-3a1 1 0 00-1-1H9z"
+                  clipRule="evenodd"
+                ></path>
+              </svg>
+              <span className="sr-only">Info</span>
+              <div>
+                <span className="font-medium">Error:</span>{" "}
+                {error.error.message}
+              </div>
+            </div>
+          </div>
+          )}
         </div>
       </div>
     </>

@@ -10,10 +10,12 @@ import {
 
 import tailwindStylesheetUrl from "./styles/tailwind.css";
 import otherStylesheetUrl from "./styles/index.css";
+import toastStylesheetUrl from 'react-toastify/dist/ReactToastify.css';
 export const links: LinksFunction = () => {
   return [
     { rel: "stylesheet", href: tailwindStylesheetUrl },
     { rel: "stylesheet", href: otherStylesheetUrl },
+    { rel: "stylesheet", href: toastStylesheetUrl },
   ];
 };
 
