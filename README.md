@@ -4,6 +4,8 @@ Este proyecto fue creado específicamente para participar en el Hackathon de [@m
 
 El proyecto es mostrado como un producto innovador, se trabajó mucho ese look de producto pero recuerden que solamente es un proyecto para una hackathon, también a considerar que está en inglés y esto es intencional, era necesario mantener la consistencia con las respuestas de la IA y la utilizada no responde bien en multi lenguajes.
 
+Si les gustó el proyecto no olviden dejar una estrellita ⭐🌟✨ No les cuesta nada, no sirve de nada pero me ayuda a saber si les gustó y mantener mejor mis proyectos con nuevos updates.
+
 ## 🗃 Tabla de contenidos
 - [Overview](#-overview)
 - [El reto](#-el-reto)
@@ -24,10 +26,10 @@ Yo elegí reutilizar un repo que tenía apenas iniciado con autenticación socia
 <a href='./landing-screenshot.png' target='_blank'>
 <img width='30%' src='./landing-screenshot.png' />
 </a>
-<a href='./landing-screenshot.png' target='_blank'>
+<a href='./search-screenshot.png' target='_blank'>
 <img width='30%' src='./search-screenshot.png' />
 </a>
-<a href='./landing-screenshot.png' target='_blank'>
+<a href='./profile-screenshot.png' target='_blank'>
 <img width='30%' src='./profile-screenshot.png' />
 </a>
 
