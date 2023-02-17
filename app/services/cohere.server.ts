@@ -17,8 +17,8 @@ export const generateReview = async (payload: string) => {
   return await cohere.generate({
     model: 'command-xlarge-nightly',
     prompt: `${SHORTER_PROMT} ${JSON.stringify(payload)}`,
-    max_tokens: 1000,
-    temperature: 0.9,
+    max_tokens: 2500,
+    temperature: 0,
     k: 250,
     p: 0.75,
     return_likelihoods: 'NONE',
